@@ -78,8 +78,9 @@ img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_bgr=False)
 # 增加视频输入
 train_pipeline = [
-    dict(type='SampleAVAFrames', clip_len=32, frame_interval=2),
-    dict(type='RawFrameDecode'),
+dict(type='DecordInit'),
+dict(type='SampleFrames', clip_len=32, frame_interval=2, num_clips=1),
+dict(type='DecordDecode'),
     dict(type='RandomRescale', scale_range=(256, 320)),
     dict(type='RandomCrop', size=256),
     dict(type='Flip', flip_ratio=0.5),
@@ -100,9 +101,14 @@ train_pipeline = [
 ]
 # The testing is w/o. any cropping / flipping
 val_pipeline = [
+    dict(type='DecordInit'),
     dict(
-        type='SampleAVAFrames', clip_len=32, frame_interval=2, test_mode=True),
-    dict(type='RawFrameDecode'),
+    type='SampleFrames',
+        clip_len=32,
+        frame_interval=2,
+        num_clips=1,
+        test_mode=True),
+    dict(type='DecordDecode'),
     dict(type='Resize', scale=(-1, 256)),
     dict(type='Normalize', **img_norm_cfg),
     dict(type='FormatShape', input_format='NCTHW', collapse=True),
